@@ -7,7 +7,7 @@ import useStyle from './styles';
 import Post from './Post/Post'
 
 
-const Posts = () => {
+const Posts = ({setCurrentId}) => {
 
   const posts = useSelector((state)=> state.posts);
   const classes = useStyle();
@@ -22,7 +22,7 @@ const Posts = () => {
 
               <Grid key={post._id} item xs={12} sm={6} >  
 
-              <Post post={post}/>
+              <Post post={post} setCurrentId={setCurrentId}/>
 
               </Grid>
            ))}
