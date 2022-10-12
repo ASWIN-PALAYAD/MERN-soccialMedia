@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { Avatar,Button,Paper,Grid,Typography,Container} from '@material-ui/core';
+import { Avatar,Button,Paper,Grid,Typography,Container, Icon} from '@material-ui/core'; 
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
+import { useDispatch } from 'react-redux';
+import jwt_decode from 'jwt-decode';
+import { useHistory } from 'react-router-dom';
+
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import useStyles from './styles';
 import Input from './input';
+import { AUTH } from '../../constants/actionType';
 
 
 const Auth = () => {
@@ -10,21 +16,44 @@ const Auth = () => {
     const classes = useStyles();
     const [showPassword, setShowPassword] = useState(false);
     const [isSignup, setIsSignup] = useState(false)
+    const dispatch = useDispatch();
+    const history = useHistory();
 
+    const handleShowPassword = () => setShowPassword((preShowPassword) => !preShowPassword)
+   
+//login or register form submit
     const handleSubmit = () => {
 
-    }
+    } 
 
+// form input fiels change
     const handleChange = () => {
 
     }
 
+// sign In or sign Up field change
     const switchMode = () => {
         setIsSignup((prevIsSignup)=> !prevIsSignup);
         handleShowPassword(false);
     }
 
-    const handleShowPassword = () => setShowPassword((preShowPassword) => !preShowPassword)
+//google login 
+    const createOrGetUser = async ( response) =>{
+      console.log(response);
+      const result = jwt_decode(response.credential);
+      console.log(result);
+
+      try {
+        dispatch({type:AUTH, data:{result}});
+        history.push('/');
+
+      } catch (error) {
+        console.log(error);
+      }
+
+    }
+
+
     
   return (
     <Container component='main' maxWidth='xs'>
@@ -54,8 +83,15 @@ const Auth = () => {
                   { isSignup ? 'Sign Up' : 'Sign In'}
               </Button>
 
+              <GoogleLogin
+                  onSuccess={credentialResponse => {
+                    createOrGetUser(credentialResponse)
+                  }}
+                  onError={() => {
+                    console.log('Login Failed');
+                  }}
+                />;
               
-
               <Grid container justify='flex-end'>
                   <Grid item> 
                       <Button onClick={switchMode} color='primary'>
