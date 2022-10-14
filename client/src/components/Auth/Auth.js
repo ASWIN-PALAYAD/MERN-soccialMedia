@@ -9,32 +9,40 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import useStyles from './styles';
 import Input from './input';
 import { AUTH } from '../../constants/actionType';
+import { signin,signup} from '../../actions/auth';
 
+const initialState = {firstName:'',lastName:'',email:'',password:'',confirmPassword:''}
 
 const Auth = () => {
 
+    const dispatch = useDispatch();
+    const history = useHistory();
     const classes = useStyles();
     const [showPassword, setShowPassword] = useState(false);
     const [isSignup, setIsSignup] = useState(false)
-    const dispatch = useDispatch();
-    const history = useHistory();
-
+    const [formData, setFormData] = useState(initialState)
     const handleShowPassword = () => setShowPassword((preShowPassword) => !preShowPassword)
    
 //login or register form submit
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+      e.preventDefault();
 
+      if(isSignup){
+        dispatch(signup(formData,history));
+      }else{
+        dispatch(signin(formData,history));
+      }
     } 
 
 // form input fiels change
-    const handleChange = () => {
-
+    const handleChange = (e) => {
+      setFormData({...formData,[e.target.name]:e.target.value})
     }
 
 // sign In or sign Up field change
     const switchMode = () => {
         setIsSignup((prevIsSignup)=> !prevIsSignup);
-        handleShowPassword(false);
+        setShowPassword(false);
     }
 
 //google login 
@@ -75,7 +83,7 @@ const Auth = () => {
                 )}
 
                 <Input name='email' label='Email address' handleChange={handleChange} type='email' />
-                <Input name='password' label='Password' handleChange={handleChange} type={showPassword ? 'text' : 'password'} handleShowPassword={handleShowPassword}  /> 
+                <Input name='password' label='Password' handleChange={handleChange} type={showPassword ? 'text' : 'password'} handleShowPassword={handleShowPassword}/> 
                 {isSignup && <Input name='confirmPassword' label='Repeat Password' handleChange={handleChange} type='password'/>}
               </Grid>
 
